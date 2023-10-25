@@ -3,7 +3,9 @@ package usecase
 import (
 	"bytes"
 	"context"
+	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -47,6 +49,8 @@ func TestFilterCustomers_ByNearLocation(t *testing.T) {
 	)
 
 	var log = logger.NewLogger(&bytes.Buffer{})
+
+	// log = logger.NewLogger(os.Stderr)
 
 	type args struct {
 		ctx                context.Context
@@ -98,6 +102,18 @@ func TestFilterCustomers_ByNearLocation(t *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
+			name: "should return filter a list with 5.000 customers",
+			args: args{
+				ctx:                context.Background(),
+				customers:          generateCustomersList([]domain.Customer{customer7, customer6, customer1, customer3, customer5}, 1_000),
+				baseLocation:       saoPaulo,
+				nearDistanceFilter: decimal.NewFromInt32(500),
+				orderBy:            domain.OrderByCustomerID,
+			},
+			want:    []domain.Customer{customer5, customer6, customer7},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "should error on orderBy parameter",
 			args: args{
 				ctx:                context.Background(),
@@ -132,4 +148,26 @@ func TestFilterCustomers_ByNearLocation(t *testing.T) {
 			assert.EqualValues(t, tt.want, got)
 		})
 	}
+}
+
+func generateCustomersList(baseList domain.Customers, N int) domain.Customers {
+	var result = append([]domain.Customer{}, baseList...)
+
+	for i := 0; i < N; i++ {
+		for _, customer := range baseList {
+			location := customer.Location
+			newLocation, _ := domain.NewCoordinate(
+				location.Latitude.StringFixed(distancePrecision),
+				location.Longitude.Add(decimal.NewFromInt32(int32(randNumber(100, 200)))).StringFixed(distancePrecision),
+			)
+			result = append(result, customer.WithLocation(newLocation))
+		}
+	}
+
+	return result
+}
+
+func randNumber(min, max int) int {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return min + r.Intn(max-min+1)
 }

@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"sort"
+	"sync"
 
 	"github.com/shopspring/decimal"
 
 	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
 	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
 )
+
+const distancePrecision = 3
 
 type FilterCustomers struct {
 	log logger.Logger
@@ -31,25 +34,38 @@ func (f *FilterCustomers) ByNearLocation(
 	var (
 		log               = f.log.FromContext(ctx)
 		nearCustomersByID = make(map[int]domain.Customer) // using a map to remove duplicated customers
+		customersCh       = make(chan domain.Customer)
 	)
 
+	log.Infof("Count customers=%d", len(customers))
+
+	wg := &sync.WaitGroup{}
+
 	// loop to calculate the distance for every customer and filter them
-	for _, customer := range customers {
-		select {
-		case <-ctx.Done():
-			return nil, errors.New("context done while calculating customers' distances")
-		default:
-		}
+	for _, c := range customers {
+		wg.Add(1)
 
-		difference := baseLocation.Difference(customer.Location)
+		go func(customer domain.Customer) {
+			defer wg.Done()
 
-		const precision = 3
-		log.Infof("Distance calculation, customer-id=%d distance=%s", customer.ID, difference.StringFixed(precision))
+			difference := baseLocation.Difference(customer.Location)
 
-		if difference.GreaterThan(nearDistanceFilter) {
-			continue // filter out customer
-		}
+			log.Infof("Distance calculation, customer-id=%d distance=%s", customer.ID, difference.StringFixed(distancePrecision))
 
+			if difference.GreaterThan(nearDistanceFilter) {
+				return // filter out customer
+			}
+
+			customersCh <- customer
+		}(c)
+	}
+
+	go func() {
+		wg.Wait()
+		close(customersCh)
+	}()
+
+	for customer := range customersCh {
 		nearCustomersByID[customer.ID] = customer
 	}
 

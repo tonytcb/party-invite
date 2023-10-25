@@ -4,11 +4,13 @@ package logger
 import (
 	"context"
 	"fmt"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
+
+	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
 )
 
 type Level string
@@ -28,6 +30,8 @@ type Logger interface {
 }
 
 type SimpleLogger struct {
+	sync.Mutex
+
 	writer io.Writer
 	cid    string
 }
@@ -36,35 +40,42 @@ func NewLogger(w io.Writer) Logger {
 	return &SimpleLogger{writer: w}
 }
 
-func (s SimpleLogger) Infof(format string, v ...any) {
-	s.writer.Write(formatContent(LevelInfo, s.cid, format, v...))
+func (s *SimpleLogger) Infof(format string, v ...any) {
+	s.write(formatContent(LevelInfo, s.cid, format, v...))
 }
 
-func (s SimpleLogger) Errorf(format string, v ...any) {
-	s.writer.Write(formatContent(LevelError, s.cid, format, v...))
+func (s *SimpleLogger) Errorf(format string, v ...any) {
+	s.write(formatContent(LevelError, s.cid, format, v...))
 }
 
-func (s SimpleLogger) Fatalf(format string, v ...any) {
+func (s *SimpleLogger) Fatalf(format string, v ...any) {
 	content := formatContent(LevelFatal, s.cid, format, v...)
 
-	s.writer.Write(content)
+	s.write(content)
 
 	panic(errors.New(string(content)))
 }
 
-func (s SimpleLogger) WithCorrelationID(cid string) Logger {
-	return SimpleLogger{
+func (s *SimpleLogger) WithCorrelationID(cid string) Logger {
+	return &SimpleLogger{
 		writer: s.writer,
 		cid:    cid,
 	}
 }
 
-func (s SimpleLogger) FromContext(ctx context.Context) Logger {
+func (s *SimpleLogger) FromContext(ctx context.Context) Logger {
 	if cid, ok := ctx.Value(config.CorrelationIDKeyName).(string); ok {
 		return s.WithCorrelationID(cid)
 	}
 
 	return s
+}
+
+func (s *SimpleLogger) write(content []byte) {
+	s.Lock()
+	defer s.Unlock()
+
+	s.writer.Write(content)
 }
 
 func formatContent(level Level, cid string, format string, v ...any) []byte {

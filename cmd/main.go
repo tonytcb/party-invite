@@ -26,7 +26,7 @@ func main() {
 	log.Infof("Starting application %s", cfg.AppName)
 
 	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 
 	var (
 		filterCustomers = http.NewFilterCustomersHandler(

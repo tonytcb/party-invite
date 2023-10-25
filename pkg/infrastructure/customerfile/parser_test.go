@@ -2,7 +2,7 @@ package customerfile
 
 import (
 	"context"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/domain"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"strings"

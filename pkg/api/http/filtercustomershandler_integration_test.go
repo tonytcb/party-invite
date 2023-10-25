@@ -11,13 +11,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/customerfile"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/usecase"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/customerfile"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/usecase"
 )
 
-// TestFilterCustomersAPI start up the http handler with real dependencies to assert http response
+// TestFilterCustomersAPI start up the http handler with real dependencies to assert http response.
 func TestFilterCustomersAPI(t *testing.T) {
 	t.Parallel()
 

@@ -3,7 +3,7 @@ package logger
 import (
 	"bytes"
 	"context"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"testing"

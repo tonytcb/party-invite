@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 )
 
 type Level string

@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
 type Server struct {

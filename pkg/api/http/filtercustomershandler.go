@@ -2,7 +2,7 @@ package http
 
 import (
 	"context"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -11,8 +11,8 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
 const (

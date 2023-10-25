@@ -16,9 +16,9 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
 func TestFilterCustomersHandler_Handle(t *testing.T) {

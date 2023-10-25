@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/domain"
 )
 
 type rawCustomer struct {

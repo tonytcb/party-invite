@@ -1,4 +1,4 @@
-module git.codesubmit.io/sfox/golang-party-invite-ivsjhn
+module github.com/tonytcb/party-invite
 
 go 1.21
 

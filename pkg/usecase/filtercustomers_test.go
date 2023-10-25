@@ -10,8 +10,8 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
 func TestFilterCustomers_ByNearLocation(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	domain "git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
+	domain "github.com/tonytcb/party-invite/pkg/domain"
 	decimal "github.com/shopspring/decimal"
 	gomock "go.uber.org/mock/gomock"
 )

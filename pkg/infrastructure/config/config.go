@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/domain"
 )
 
 type CorrelationIDKey string

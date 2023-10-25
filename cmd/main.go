@@ -8,11 +8,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/api/http"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/customerfile"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/usecase"
+	"github.com/tonytcb/party-invite/pkg/api/http"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/customerfile"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
+	"github.com/tonytcb/party-invite/pkg/usecase"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	log.Infof("Starting application %s", cfg.AppName)
 
 	done := make(chan os.Signal, 1)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	var (
 		filterCustomers = http.NewFilterCustomersHandler(

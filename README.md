@@ -1,33 +1,51 @@
-### Objective
+# Party Invite App
 
-Your assignment is to implement a service that parses as a list of customers and returns their names based on location. Use Go and no framework.
+The goal of this project is design a Golang application serving an HTTP API to filter customers close to a specific location, when the input is a file containing customers and its geolocation.
 
-### Brief
+More details in the [PROBLEM](PROBLEM.md) file.
 
-We have some customer records in a text file `./Data/customers.txt` -- one customer per line, JSON lines formatted. We want to invite any customer within 100km of our office for some food and drinks on us.
+## Design Solution
 
-### Tasks
+The application architecture follows the principles of the **Clean Architecture**, originally described by Robert C. Martin. The foundation of this kind of architecture is the dependency injection, producing systems that are independent of external agents, highly testable and easier to maintain.
 
-Write a web service that:
+You can read more about Clean Architecture [here](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
 
--   Has an endpoint that accepts a .txt file containting customers. See a sample file in `./Data`
-    -   Read the full list of customers
-    -   Output the names and user ids of matching customers (within 100km), sorted by User ID (ascending). The output should be in JSON.
--   No authentication is required
--   You can use the first formula from [this Wikipedia article](https://en.wikipedia.org/wiki/Great-circle_distance) to calculate distance. Don't forget, you'll need to convert degrees to radians. The GPS coordinates for our Dublin office are 53.339428, -6.257664. You can find the Customer list in `./Data`.
+## Tools
 
-### Evaluation Criteria
+- [Golang 1.21](https://go.dev/)
+- [Docker](https://www.docker.com/)
+- [Docker-compose](https://docs.docker.com/compose/)
 
--   **Go** best practices
--   We're looking for you to produce working code, with enough room to demonstrate how to structure components in a small program.
--   Poor answers will be in the form of one big function. It’s impossible to test anything smaller than the entire operation of the program, including reading from the input file. Errors are caught and ignored.
--   Good answers are well composed. Calculating distances and reading from a file are separate concerns. Classes or functions have clearly defined responsibilities. Test cases cover likely problems with input data.
--   It’s an excellent answer if we've learned something from reading the code.
+## API
 
-### CodeSubmit
+### Filter Customers endpoint
 
-Please organize, design, test and document your code as if it were going into production - then push your changes to the master branch. After you have pushed your code, you may submit the assignment on the assignment page.
+- Method: `POST`
+- Path: `/filter-customers`
+- Params:
+- - `file`: file containing a list of customers formatted as a JSON, each one in its own line. See an example [here](./Data/customers.txt).
+- Response: A JSON containing the customers near to the specified location.
 
-All the best and happy coding,
+### Commands
 
-The sFOX Team
+- `make help` to see all commands;
+- `make up` starts the app serving http api;
+- `make test` to run all tests.
+
+## Configurations
+
+Instead of hardcode configurations, like `distance from base location` and `http port`, we are using a [.dot](./app.env) to define and easily change such parameters.
+
+## TODO
+
+- [ ] Implement a simple middleware
+- [ ] Improve logger package using a third-party package, like logrus
+- [ ] Add OpenTelemetry traces
+- [ ] Implement integration tests
+- [ ] Hot reload for docker development environment
+- [ ] Docker file for production with multi stages
+- [ ] Cache requests
+- [ ] Idempotent API
+- [ ] Decouple input and output from filter handler
+- [ ] Add a concurrency mechanism on usecase layer to calculate distances 
+- [ ] 

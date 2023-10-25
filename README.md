@@ -41,7 +41,7 @@ Instead of hardcode configurations, like `distance from base location` and `http
 - [ ] Implement a simple middleware
 - [ ] Improve logger package using a third-party package, like logrus
 - [ ] Add OpenTelemetry traces
-- [ ] Implement integration tests
+- [x] Implement integration tests
 - [ ] Hot reload for docker development environment
 - [ ] Docker file for production with multi stages
 - [ ] Cache requests

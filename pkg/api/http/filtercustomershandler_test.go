@@ -2,12 +2,6 @@ package http
 
 import (
 	"bytes"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
-	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
-	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
-	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"io"
 	"mime/multipart"
@@ -17,6 +11,14 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
+
+	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
+	"github.com/stretchr/testify/assert"
+
+	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/domain"
+	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/config"
+	"git.codesubmit.io/sfox/golang-party-invite-ivsjhn/pkg/infrastructure/logger"
 )
 
 func TestFilterCustomersHandler_Handle(t *testing.T) {

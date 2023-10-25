@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile.local
+      context: .
+    container_name: party-invite-app
+    ports:
+      - "8080:8080"
+
+  test:
+    build:
+      dockerfile: ./Dockerfile.test
+      context: .

@@ -1,0 +1,9 @@
+FROM golang:1.21-bullseye
+
+WORKDIR /app
+
+COPY . .
+
+RUN go mod download
+
+CMD CGO_ENABLED=1 go test -race ./...

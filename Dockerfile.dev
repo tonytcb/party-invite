@@ -1,0 +1,19 @@
+FROM golang:1.21-bullseye
+
+WORKDIR /app
+
+# Copy go.mod and go.sum files to the workspace
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o /party-invite ./cmd/main.go
+
+# RUN go get -u github.com/cosmtrek/air
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+
+RUN echo $PATH
+
+CMD air

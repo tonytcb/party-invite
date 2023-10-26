@@ -1,17 +1,18 @@
 package http
 
 import (
+	"bytes"
 	"context"
-	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"path/filepath"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
 	"github.com/tonytcb/party-invite/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
@@ -21,7 +22,7 @@ const (
 	maximumFileUploadSize = 10 << 20 // 10mb
 )
 
-//go:generate mockgen -source=filtercustomershandler.go -destination=mock_filtercustomers_test.go -package=http CustomersFileParser,FilterCustomersUsecase
+//go:generate mockgen -source=filtercustomershandler.go -destination=mock_filtercustomers_test.go -package=http CustomersFileParser,FilterCustomersUsecase,FilterCustomersCache
 
 type CustomersFileParser interface {
 	Parse(context.Context, io.Reader) (domain.Customers, error)
@@ -37,11 +38,18 @@ type FilterCustomersUsecase interface {
 	) (domain.Customers, error)
 }
 
+type FilterCustomersCache interface {
+	Get(context.Context, []byte) ([]byte, error)
+	Save(context.Context, []byte, []byte) error
+}
+
 type FilterCustomersHandler struct {
-	log    logger.Logger
-	cfg    *config.Config
+	log logger.Logger
+	cfg *config.Config
+
 	parser CustomersFileParser
 	filter FilterCustomersUsecase
+	cache  FilterCustomersCache
 }
 
 func NewFilterCustomersHandler(
@@ -49,8 +57,9 @@ func NewFilterCustomersHandler(
 	cfg *config.Config,
 	parser CustomersFileParser,
 	filter FilterCustomersUsecase,
+	cache FilterCustomersCache,
 ) *FilterCustomersHandler {
-	return &FilterCustomersHandler{log: log, cfg: cfg, parser: parser, filter: filter}
+	return &FilterCustomersHandler{log: log, cfg: cfg, parser: parser, filter: filter, cache: cache}
 }
 
 // Handle filters a list of customer given the input file.
@@ -94,7 +103,25 @@ func (h *FilterCustomersHandler) Handle(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	customers, err := h.parser.Parse(ctx, file)
+	// to read the file twice, we need to duplicate it since it's a buffer
+	var tempBuf = &bytes.Buffer{}
+	var tempFile = io.TeeReader(file, tempBuf)
+
+	fileContents, _ := io.ReadAll(tempBuf)
+	//fileReader := io.NopCloser(bytes.NewReader(fileContents))
+
+	cachedResponse, err := h.cache.Get(ctx, fileContents)
+	if err != nil {
+		newHTTPError(err, "error to load cache", errToStatusCode(err)).json(w)
+		return
+	}
+
+	if cachedResponse != nil {
+		w.Write(cachedResponse) //nolint:errcheck
+		return
+	}
+
+	customers, err := h.parser.Parse(ctx, tempFile)
 	if err != nil {
 		newHTTPError(err, "error to parse input file", errToStatusCode(err)).json(w)
 		return
@@ -122,5 +149,9 @@ func (h *FilterCustomersHandler) Handle(w http.ResponseWriter, r *http.Request) 
 
 	if _, err = w.Write(response); err != nil {
 		newHTTPError(err, "", http.StatusInternalServerError).empty(w)
+	}
+
+	if err = h.cache.Save(ctx, fileContents, response); err != nil {
+		log.Errorf("Error to store response on cache: %v", err)
 	}
 }

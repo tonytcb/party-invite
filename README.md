@@ -44,8 +44,9 @@ Instead of hardcode configurations, like `distance from base location` and `http
 - [x] Implement integration tests
 - [ ] Hot reload for docker development environment
 - [ ] Docker file for production with multi stages
-- [ ] Cache requests
+- [x] Cache requests
 - [ ] Idempotent API
 - [ ] Decouple input and output from filter handler
-- [ ] Add a concurrency mechanism on usecase layer to calculate distances 
-- [ ] 
+- [x] Add a concurrency mechanism on usecase layer to calculate distances 
+- [ ] Some notification system
+- [ ]

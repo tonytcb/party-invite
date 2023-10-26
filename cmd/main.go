@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/tonytcb/party-invite/pkg/api/http"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/cache"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/customerfile"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
@@ -34,6 +35,7 @@ func main() {
 			cfg,
 			customerfile.NewCustomersFileParser(),
 			usecase.NewFilterCustomers(log),
+			cache.NewInMemoryFilterCustomersCache(log),
 		)
 		httpServer = http.NewServer(log, filterCustomers)
 	)

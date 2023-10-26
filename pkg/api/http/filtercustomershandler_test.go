@@ -60,6 +60,7 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 	type fields struct {
 		parser func(*testing.T, *gomock.Controller) CustomersFileParser
 		filter func(*testing.T, *gomock.Controller) FilterCustomersUsecase
+		cache  func(*testing.T, *gomock.Controller) FilterCustomersCache
 	}
 	type args struct {
 		responseWriter http.ResponseWriter
@@ -96,6 +97,18 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 
 					return filter
 				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					cache.EXPECT().
+						Get(gomock.Any(), gomock.Any()).
+						Return(nil, nil).
+						Times(1)
+					cache.EXPECT().
+						Save(gomock.Any(), gomock.Any(), gomock.Any()).
+						Return(nil).
+						Times(1)
+					return cache
+				},
 			},
 			args: args{
 				responseWriter: httptest.NewRecorder(),
@@ -103,6 +116,31 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 			},
 			wantStatusCode:   http.StatusOK,
 			wantResponseBody: `[{"id":1,"name":"User name 1"},{"id":2,"name":"User name 2"}]`,
+		},
+		{
+			name: "should return cached response",
+			fields: fields{
+				parser: func(t *testing.T, ctrl *gomock.Controller) CustomersFileParser {
+					return nil
+				},
+				filter: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersUsecase {
+					return nil
+				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					cache.EXPECT().
+						Get(gomock.Any(), gomock.Any()).
+						Return([]byte(`[{"id":2,"name":"User name 2"}]`), nil).
+						Times(1)
+					return cache
+				},
+			},
+			args: args{
+				responseWriter: httptest.NewRecorder(),
+				request:        postRequestWithValidFile,
+			},
+			wantStatusCode:   http.StatusOK,
+			wantResponseBody: `[{"id":2,"name":"User name 2"}]`,
 		},
 
 		{
@@ -113,6 +151,10 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 				},
 				filter: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersUsecase {
 					return NewMockFilterCustomersUsecase(ctrl)
+				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					return cache
 				},
 			},
 			args: args{
@@ -131,6 +173,10 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 				filter: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersUsecase {
 					return NewMockFilterCustomersUsecase(ctrl)
 				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					return cache
+				},
 			},
 			args: args{
 				responseWriter: httptest.NewRecorder(),
@@ -147,6 +193,10 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 				},
 				filter: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersUsecase {
 					return NewMockFilterCustomersUsecase(ctrl)
+				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					return cache
 				},
 			},
 			args: args{
@@ -169,6 +219,14 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 				},
 				filter: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersUsecase {
 					return NewMockFilterCustomersUsecase(ctrl)
+				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					cache.EXPECT().
+						Get(gomock.Any(), gomock.Any()).
+						Return(nil, nil).
+						Times(1)
+					return cache
 				},
 			},
 			args: args{
@@ -199,6 +257,14 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 
 					return filter
 				},
+				cache: func(t *testing.T, ctrl *gomock.Controller) FilterCustomersCache {
+					cache := NewMockFilterCustomersCache(ctrl)
+					cache.EXPECT().
+						Get(gomock.Any(), gomock.Any()).
+						Return(nil, nil).
+						Times(1)
+					return cache
+				},
 			},
 			args: args{
 				responseWriter: httptest.NewRecorder(),
@@ -221,6 +287,7 @@ func TestFilterCustomersHandler_Handle(t *testing.T) {
 				cfg:    defaultConfig,
 				parser: tt.fields.parser(t, mockCtrl),
 				filter: tt.fields.filter(t, mockCtrl),
+				cache:  tt.fields.cache(t, mockCtrl),
 			}
 			h.Handle(tt.args.responseWriter, tt.args.request)
 
@@ -260,7 +327,7 @@ func newRequestWithFile(method string, endpoint string, fieldName string, fileNa
 	if _, err = io.Copy(part, file); err != nil {
 		return nil, errors.Wrap(err, "error to read multipart file")
 	}
-	writer.Close()
+	defer writer.Close()
 
 	r, err := http.NewRequest(method, endpoint, body)
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/tonytcb/party-invite/pkg/infrastructure/cache"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/customerfile"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
@@ -36,18 +37,19 @@ func TestFilterCustomersAPI(t *testing.T) {
 		cfg,
 		customerfile.NewCustomersFileParser(),
 		usecase.NewFilterCustomers(log),
+		cache.NewInMemoryFilterCustomersCache(log),
 	)
 
 	w := httptest.NewRecorder()
 
-	postRequestWithValidFile, err := newRequestWithFile(http.MethodPost, "localhost:8080/filter-customers", "file", "customers.txt")
+	postRequestWithValidFile, err := newRequestWithFile(http.MethodPost, "localhost:8080", "file", "customers.txt")
 	if err != nil {
 		t.Fatal("failed to create valid request")
 	}
 
 	filterCustomersHandler.Handle(w, postRequestWithValidFile)
 
-	// assert
+	// asserts
 
 	const expectedStatusCode = 200
 	const expectedBody = `[{"id":4,"name":"Ian Kehoe"},{"id":5,"name":"Nora Dempsey"},{"id":6,"name":"Theresa Enright"},{"id":8,"name":"Eoin Ahearn"},{"id":11,"name":"Richard Finnegan"},{"id":12,"name":"Christina McArdle"},{"id":13,"name":"Olive Ahearn"},{"id":15,"name":"Michael Ahearn"},{"id":17,"name":"Patricia Cahill"},{"id":23,"name":"Eoin Gallagher"},{"id":24,"name":"Rose Enright"},{"id":26,"name":"Stephen McArdle"},{"id":29,"name":"Oliver Ahearn"},{"id":30,"name":"Nick Enright"},{"id":31,"name":"Alan Behan"},{"id":39,"name":"Lisa Ahearn"}]`

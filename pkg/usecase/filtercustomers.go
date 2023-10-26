@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"sort"
 	"sync"
 
+	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
 	"github.com/tonytcb/party-invite/pkg/domain"
@@ -14,13 +14,19 @@ import (
 
 const distancePrecision = 3
 
-type FilterCustomers struct {
-	log logger.Logger
+type FilterCustomersNotifier interface {
+	Notify(context.Context, *domain.Customer) error
 }
 
-func NewFilterCustomers(log logger.Logger) *FilterCustomers {
+type FilterCustomers struct {
+	log      logger.Logger
+	notifier FilterCustomersNotifier
+}
+
+func NewFilterCustomers(log logger.Logger, notifier FilterCustomersNotifier) *FilterCustomers {
 	return &FilterCustomers{
-		log: log,
+		log:      log,
+		notifier: notifier,
 	}
 }
 
@@ -56,6 +62,10 @@ func (f *FilterCustomers) ByNearLocation(
 				return // filter out customer
 			}
 
+			if err := f.notifier.Notify(ctx, &customer); err != nil {
+				log.Infof("Error to notify customer invited id=%d", customer.ID)
+			}
+
 			customersCh <- customer
 		}(c)
 	}
@@ -71,6 +81,14 @@ func (f *FilterCustomers) ByNearLocation(
 
 	var result = customersMapValues(nearCustomersByID)
 
+	if err := f.sort(result, orderBy); err != nil {
+		return nil, errors.Wrap(err, "error to sort result")
+	}
+
+	return result, nil
+}
+
+func (f *FilterCustomers) sort(result domain.Customers, orderBy domain.OrderBy) error {
 	switch orderBy {
 	case domain.OrderByCustomerID:
 		sort.Slice(result, func(i, j int) bool {
@@ -78,10 +96,10 @@ func (f *FilterCustomers) ByNearLocation(
 		})
 
 	default:
-		return nil, errors.New("unexpected order by")
+		return errors.New("unexpected order by")
 	}
 
-	return result, nil
+	return nil
 }
 
 func customersMapValues(customersMap map[int]domain.Customer) domain.Customers {

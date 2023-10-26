@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/tonytcb/party-invite/pkg/domain"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/customernotify"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 )
 
@@ -49,6 +50,7 @@ func TestFilterCustomers_ByNearLocation(t *testing.T) {
 	)
 
 	var log = logger.NewLogger(&bytes.Buffer{})
+	var notifier = customernotify.NewStdOutNotifier(log)
 
 	// log = logger.NewLogger(os.Stderr)
 
@@ -133,7 +135,7 @@ func TestFilterCustomers_ByNearLocation(t *testing.T) {
 		tt := tt
 
 		t.Run(tt.name, func(t *testing.T) {
-			f := NewFilterCustomers(log)
+			f := NewFilterCustomers(log, notifier)
 
 			got, err := f.ByNearLocation(
 				tt.args.ctx,

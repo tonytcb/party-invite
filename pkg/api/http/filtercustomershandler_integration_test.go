@@ -1,7 +1,6 @@
 package http
 
 import (
-	"bytes"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,6 +13,7 @@ import (
 	"github.com/tonytcb/party-invite/pkg/infrastructure/cache"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/config"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/customerfile"
+	"github.com/tonytcb/party-invite/pkg/infrastructure/customernotify"
 	"github.com/tonytcb/party-invite/pkg/infrastructure/logger"
 	"github.com/tonytcb/party-invite/pkg/usecase"
 )
@@ -22,10 +22,7 @@ import (
 func TestFilterCustomersAPI(t *testing.T) {
 	t.Parallel()
 
-	var (
-		buf = bytes.NewBuffer([]byte(""))
-		log = logger.NewLogger(buf)
-	)
+	var log = logger.NewEmptyLogger()
 
 	cfg, err := loadConfig()
 	if err != nil {
@@ -36,7 +33,7 @@ func TestFilterCustomersAPI(t *testing.T) {
 		log,
 		cfg,
 		customerfile.NewCustomersFileParser(),
-		usecase.NewFilterCustomers(log),
+		usecase.NewFilterCustomers(log, customernotify.NewStdOutNotifier(log)),
 		cache.NewInMemoryFilterCustomersCache(log),
 	)
 

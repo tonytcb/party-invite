@@ -43,10 +43,10 @@ Instead of hardcode configurations, like `distance from base location` and `http
 - [ ] Add OpenTelemetry traces
 - [x] Implement integration tests
 - [x] Hot reload for docker development environment
-- [ ] Docker file for production with multi stages
+- [x] Docker file for production with multi stages
 - [x] Cache requests
 - [ ] Idempotent API
 - [ ] Decouple input and output from filter handler
 - [x] Add a concurrency mechanism on usecase layer to calculate distances 
-- [ ] Some notification system
-- [ ]
+- [x] Some notification system
+- [ ] Github Action to run tests, plus add badges

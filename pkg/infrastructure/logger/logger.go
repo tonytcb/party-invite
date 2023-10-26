@@ -29,6 +29,13 @@ type Logger interface {
 	FromContext(ctx context.Context) Logger
 }
 
+type emptyWriter struct {
+}
+
+func (e emptyWriter) Write(_ []byte) (int, error) {
+	return 0, nil
+}
+
 type SimpleLogger struct {
 	sync.Mutex
 
@@ -38,6 +45,10 @@ type SimpleLogger struct {
 
 func NewLogger(w io.Writer) Logger {
 	return &SimpleLogger{writer: w}
+}
+
+func NewEmptyLogger() Logger {
+	return NewLogger(&emptyWriter{})
 }
 
 func (s *SimpleLogger) Infof(format string, v ...any) {

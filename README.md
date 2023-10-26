@@ -1,7 +1,7 @@
 # Party Invite App
 
 [![tests](https://github.com/tonytcb/party-invite/actions/workflows/makefile.yml/badge.svg)](https://github.com/tonytcb/party-invite/actions/workflows/makefile.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tonytcb/party-invite)](https://goreportcard.com/report/github.com/ethereum/go-ethereum)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tonytcb/party-invite)](https://goreportcard.com/report/github.com/tonytcb/party-invite)
 
 The goal of this project is design a Golang application serving an HTTP API to filter customers close to a specific location, when the input is a file containing customers and its geolocation.
 

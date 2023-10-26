@@ -29,3 +29,8 @@ lint:
 ## lint-all: runs linter for all packages
 lint-all:
 	@ docker run  --rm -v "`pwd`:/workspace:cached" -w "/workspace/." golangci/golangci-lint:latest golangci-lint run
+
+## build-image-prod: build a docker image ready for production
+build-image-prod:
+	docker build -t party-invite-prod .
+	## docker container run --name party-invite-prod -p 8080:8080 party-invite-prod

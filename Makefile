@@ -30,6 +30,12 @@ lint:
 lint-all:
 	@ docker run  --rm -v "`pwd`:/workspace:cached" -w "/workspace/." golangci/golangci-lint:latest golangci-lint run
 
+
+## unit-test-ci: runs all tests on CI, with no Docker
+unit-test-ci:
+	@go generate
+	@go test -v -race ./...
+
 ## build-image-prod: build a docker image ready for production
 build-image-prod:
 	docker build -t party-invite-prod .

@@ -53,4 +53,4 @@ Instead of hardcode configurations, like `distance from base location` and `http
 - [ ] Decouple input and output from filter handler
 - [x] Add a concurrency mechanism on usecase layer to calculate distances 
 - [x] Some notification system
-- [ ] Github Action to run tests, plus add badges
+- [x] Github Action to run tests, plus add badges
